@@ -66,6 +66,6 @@
         dest: "/etc/hadoop/core-site.xml"
         src: "/root/ansiblework/task_11_1/core.xml"
     - name: "Formatting the name node drive"
-      command: "hadoop namenode -format"
+      shell: "echo Y | hadoop namenode -format"
     - name: "Starting Name Node "
       command: "hadoop-daemon.sh start namenode"
