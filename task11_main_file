@@ -1,0 +1,71 @@
+#For Configuring Data Nodes
+- hosts: Data_Nodes
+  vars_prompt:
+    - name: "data_dir"
+      private: no
+      prompt: "Enter name of Data Node directory which you want to keep "
+  tasks:
+    - name: "Downloading python library for downloading Hadoop and jdk"
+      pip:
+        name: gdown
+    - name: "Downloading hadoop and and JDK to the target node"
+      command: "{{item}}"
+      loop:
+              - "gdown --id 17UWQNVdBdGlyualwWX4Cc96KyZhD-lxz"
+              - "gdown --id 1541gbFeGZZJ5k9Qx65D04lpeNBw87rM5"
+    - name: "Installing Jdk on target node"
+      command: "rpm -i jdk-8u171-linux-x64.rpm"
+      ignore_errors: yes
+    - name: "Installing hadoop on target node"
+      command: " rpm -i hadoop-1.2.1-1.x86_64.rpm --force"
+    - name: "Creating a directory for data node to share"
+      file:
+              state: directory
+              path: "/{{data_dir}}"
+    - name: "Configuring hdfs-site file in Data Node"
+      template:
+       dest: "/etc/hadoop/hdfs-site.xml"
+       src: "/root/ansiblework/task_11_1/hdfs_data.xml"
+    - name: "Configuring core-site file in Data Node"
+      template:
+       dest: "/etc/hadoop/core-site.xml"
+       src: "/root/ansiblework/task_11_1/core.xml"
+    - name: "Starting Data Node "
+      command: "hadoop-daemon.sh start datanode"
+
+#For Configuring Name Node
+- hosts: localhost
+  vars_prompt:
+    - name: "name_dir"
+      private: no
+      prompt: "Enter name of Name Node Directory which you want to keep "
+  tasks:
+    - name: "Downloading python library for downloading Hadoop and jdk"
+      pip:
+        name: gdown
+    - name: "Downloading hadoop and and JDK to the name  node"
+      command: "{{item}}"
+      loop:
+              - "gdown --id 17UWQNVdBdGlyualwWX4Cc96KyZhD-lxz"
+              - "gdown --id 1541gbFeGZZJ5k9Qx65D04lpeNBw87rM5"
+    - name: "Installing Jdk on name  node"
+      command: "rpm -i jdk-8u171-linux-x64.rpm"
+      ignore_errors: yes
+    - name: "Installing hadoop on name node"
+      command: " rpm -i hadoop-1.2.1-1.x86_64.rpm --force"
+    - name: "Creating a directory for name  node"
+      file:
+              state: directory
+              path: "/{{name_dir}}"
+    - name: "Configuring hdfs-site file in NameNode"
+      template:
+        dest: "/etc/hadoop/hdfs-site.xml"
+        src: "/root/ansiblework/task_11_1/hdfs_name.xml"
+    - name: "Configuring core-site file in NameNode"
+      template:
+        dest: "/etc/hadoop/core-site.xml"
+        src: "/root/ansiblework/task_11_1/core.xml"
+    - name: "Formatting the name node drive"
+      command: "hadoop namenode -format"
+    - name: "Starting Name Node "
+      command: "hadoop-daemon.sh start namenode"
